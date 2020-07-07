@@ -2,8 +2,8 @@ package e
 
 // MsgFlags 错误信息映射
 var MsgFlags = map[int]string{
-	Success:                    "ok",
-	Error:                      "fail",
+	Success:                    "成功",
+	Error:                      "失败",
 	InvalidParams:              "请求参数错误",
 	ErrorExistTag:              "已存在该标签名称",
 	ErrorNotExistTag:           "该标签不存在",
