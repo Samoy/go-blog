@@ -107,7 +107,6 @@ func EditTag(c *gin.Context) {
 		msg = e.GetMsg(code)
 	} else {
 		for _, err := range valid.Errors {
-			print(err.Message)
 			msg += err.Message + ";"
 		}
 		msg = strings.TrimRight(msg, ";")
@@ -139,7 +138,6 @@ func DeleteTag(c *gin.Context) {
 		msg = e.GetMsg(code)
 	} else {
 		for _, err := range valid.Errors {
-			print(err.Message)
 			msg += err.Message + ";"
 		}
 		msg = strings.TrimRight(msg, ";")
