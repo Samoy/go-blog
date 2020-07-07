@@ -59,7 +59,6 @@ func AddTag(c *gin.Context) {
 		msg = e.GetMsg(code)
 	} else {
 		for _, err := range valid.Errors {
-			print(err.Message)
 			msg += err.Message + ";"
 		}
 		msg = strings.TrimRight(msg, ";")
