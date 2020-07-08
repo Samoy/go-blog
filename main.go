@@ -1,15 +1,21 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"net/http"
+	"os"
+	"os/signal"
+	"time"
 
+	"github.com/samoy/go-blog/pkg/logging"
 	"github.com/samoy/go-blog/pkg/setting"
 	"github.com/samoy/go-blog/routers"
 )
 
 func main() {
 	router := routers.InitRouter()
+
 	s := &http.Server{
 		Addr:           fmt.Sprintf(":%d", setting.HTTPPort),
 		Handler:        router,
@@ -18,5 +24,23 @@ func main() {
 		MaxHeaderBytes: 1 << 20,
 	}
 
-	s.ListenAndServe()
+	go func() {
+		if err := s.ListenAndServe(); err != nil {
+			logging.Fatalf("Listen: %s\n", err)
+		}
+	}()
+
+	quit := make(chan os.Signal)
+	signal.Notify(quit, os.Interrupt)
+	<-quit
+
+	logging.Info("Shutdown Server ...")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	if err := s.Shutdown(ctx); err != nil {
+		logging.Fatalf("Server Shutdown:", err)
+	}
+
+	logging.Info("Server exiting")
 }

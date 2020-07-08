@@ -26,7 +26,7 @@ func init() {
 	)
 	sec, err := setting.Cfg.GetSection("database")
 	if err != nil {
-		logging.Fatal("Failed to get section 'database':%v", err)
+		logging.Fatalf("Failed to get section 'database':%v", err)
 	}
 	dbType = sec.Key("TYPE").String()
 	dbName = sec.Key("NAME").String()
@@ -40,7 +40,7 @@ func init() {
 		host,
 		dbName))
 	if err != nil {
-		logging.Fatal("Failed to connect database:%v", err)
+		logging.Fatalf("Failed to connect database:%v", err)
 	}
 	gorm.DefaultTableNameHandler = func(db *gorm.DB, defaultTabName string) string {
 		return tabPrefix + defaultTabName
