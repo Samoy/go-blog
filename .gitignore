@@ -1,9 +1,15 @@
 # Created by https://www.toptal.com/developers/gitignore/api/go
 # Edit at https://www.toptal.com/developers/gitignore?templates=go
 
+### Miscellaneous ###
+.DS_Store
+
 ### IDE ###
 .vscode
 .idea
+
+### LOG ###
+runtime/logs/
 
 ### Go ###
 # Binaries for programs and plugins

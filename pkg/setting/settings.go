@@ -1,10 +1,10 @@
 package setting
 
 import (
-	"log"
 	"time"
 
 	"github.com/go-ini/ini"
+	"github.com/samoy/go-blog/pkg/logging"
 )
 
 var (
@@ -29,7 +29,7 @@ func init() {
 	var err error
 	Cfg, err = ini.Load("conf/app.ini")
 	if err != nil {
-		log.Fatalf("Failed to parse 'conf/app.ini':%v", err)
+		logging.Fatalf("Failed to parse 'conf/app.ini':%v", err)
 	}
 	loadBase()
 	loadServer()
@@ -43,7 +43,7 @@ func loadBase() {
 func loadServer() {
 	sec, err := Cfg.GetSection("server")
 	if err != nil {
-		log.Fatalf("Failed to get section 'server':%v", err)
+		logging.Fatalf("Failed to get section 'server':%v", err)
 	}
 	HTTPPort = sec.Key("HTTP_PORT").MustInt(8000)
 	ReadTimeout = time.Duration(sec.Key("READ_TIMEOUT").MustInt(60)) * time.Second
@@ -53,7 +53,7 @@ func loadServer() {
 func loadApp() {
 	sec, err := Cfg.GetSection("app")
 	if err != nil {
-		log.Fatalf("Failed to get section 'app': %v", err)
+		logging.Fatalf("Failed to get section 'app': %v", err)
 	}
 
 	JwtSecret = sec.Key("JWT_SECRET").MustString("2020$06281408")

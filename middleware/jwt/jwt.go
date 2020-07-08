@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/samoy/go-blog/pkg/e"
+	"github.com/samoy/go-blog/pkg/logging"
 	"github.com/samoy/go-blog/pkg/util"
 )
 
@@ -21,6 +22,7 @@ func JWT() gin.HandlerFunc {
 		} else {
 			claims, err := util.ParseToken(token)
 			if err != nil {
+				logging.Error("token", err)
 				code = e.ErrorAuthCheckTokenFail
 			} else if time.Now().Unix() > claims.ExpiresAt {
 				code = e.ErrorAuthCheckTokenTimeout
