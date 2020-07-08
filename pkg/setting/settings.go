@@ -1,61 +1,80 @@
 package setting
 
 import (
+	"log"
 	"time"
 
 	"github.com/go-ini/ini"
-	"github.com/samoy/go-blog/pkg/logging"
 )
 
-var (
-	// Cfg 配置文件
-	Cfg *ini.File
-	// RunMode 运行模式
-	RunMode string
-	// HTTPPort 运行端口
-	HTTPPort int
-	// ReadTimeout 读取超时时间
-	ReadTimeout time.Duration
-	// WriteTimeout 写入超时时间
+// App app配置Model
+type App struct {
+	JwtSecret       string
+	PageSize        int
+	RuntimeRootPath string
+
+	ImagePrefixURL string
+	ImageSavePath  string
+	ImageMaxSize   int
+	ImageAllowExts []string
+
+	LogSavePath string
+	LogSaveName string
+	LogFileExt  string
+	TimeFormat  string
+}
+
+// AppSetting app配置
+var AppSetting = &App{}
+
+// Server 服务器配置Model
+type Server struct {
+	RunMode      string
+	HTTPPort     int
+	ReadTimeout  time.Duration
 	WriteTimeout time.Duration
-
-	// PageSize 每页条数
-	PageSize int
-	// JwtSecret Jwt密钥
-	JwtSecret string
-)
-
-func init() {
-	var err error
-	Cfg, err = ini.Load("conf/app.ini")
-	if err != nil {
-		logging.Fatalf("Failed to parse 'conf/app.ini':%v", err)
-	}
-	loadBase()
-	loadServer()
-	loadApp()
 }
 
-func loadBase() {
-	RunMode = Cfg.Section("").Key("RUN_MODE").MustString("debug")
+// ServerSetting 服务器配置
+var ServerSetting = &Server{}
+
+// Database 数据库配置Model
+type Database struct {
+	Type        string
+	User        string
+	Password    string
+	Host        string
+	Name        string
+	TablePrefix string
 }
 
-func loadServer() {
-	sec, err := Cfg.GetSection("server")
-	if err != nil {
-		logging.Fatalf("Failed to get section 'server':%v", err)
-	}
-	HTTPPort = sec.Key("HTTP_PORT").MustInt(8000)
-	ReadTimeout = time.Duration(sec.Key("READ_TIMEOUT").MustInt(60)) * time.Second
-	WriteTimeout = time.Duration(sec.Key("WRITE_TIMEOUT").MustInt(60)) * time.Second
-}
+// DatabaseSetting 数据库配置
+var DatabaseSetting = &Database{}
 
-func loadApp() {
-	sec, err := Cfg.GetSection("app")
+// Setup 初始化
+func Setup() {
+	Cfg, err := ini.Load("conf/app.ini")
 	if err != nil {
-		logging.Fatalf("Failed to get section 'app': %v", err)
+		log.Fatalf("Fail to parse 'conf/app.ini': %v", err)
 	}
 
-	JwtSecret = sec.Key("JWT_SECRET").MustString("2020$06281408")
-	PageSize = sec.Key("PAGE_SIZE").MustInt(10)
+	err = Cfg.Section("app").MapTo(AppSetting)
+	if err != nil {
+		log.Fatalf("Cfg.MapTo AppSetting err: %v", err)
+	}
+
+	AppSetting.ImageMaxSize = AppSetting.ImageMaxSize * 1024 * 1024
+
+	err = Cfg.Section("server").MapTo(ServerSetting)
+	if err != nil {
+		log.Fatalf("Cfg.MapTo ServerSetting err: %v", err)
+	}
+
+	ServerSetting.ReadTimeout = ServerSetting.ReadTimeout * time.Second
+	ServerSetting.WriteTimeout = ServerSetting.ReadTimeout * time.Second
+
+	err = Cfg.Section("database").MapTo(DatabaseSetting)
+	if err != nil {
+		log.Fatalf("Cfg.MapTo DatabaseSetting err: %v", err)
+	}
 }

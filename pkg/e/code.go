@@ -23,4 +23,10 @@ const (
 	ErrorAuthToken = 20003
 	// ErrorAuth Token错误
 	ErrorAuth = 20004
+	// ErrorUploadSaveImageFail 保存图片失败
+	ErrorUploadSaveImageFail = 30001
+	// ErrorUploadCheckImageFail 检查图片失败
+	ErrorUploadCheckImageFail = 30002
+	// ErrorUploadCheckImageFormat 校验图片错误，图片格式或大小有问题
+	ErrorUploadCheckImageFormat = 30003
 )

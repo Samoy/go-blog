@@ -8,8 +8,8 @@
 .vscode
 .idea
 
-### LOG ###
-runtime/logs/
+### Runtime ###
+runtime/
 
 ### Go ###
 # Binaries for programs and plugins

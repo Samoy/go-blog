@@ -8,19 +8,24 @@ import (
 	"os/signal"
 	"time"
 
+	"github.com/samoy/go-blog/models"
 	"github.com/samoy/go-blog/pkg/logging"
 	"github.com/samoy/go-blog/pkg/setting"
 	"github.com/samoy/go-blog/routers"
 )
 
 func main() {
-	router := routers.InitRouter()
 
+	setting.Setup()
+	models.Setup()
+	logging.Setup()
+
+	router := routers.InitRouter()
 	s := &http.Server{
-		Addr:           fmt.Sprintf(":%d", setting.HTTPPort),
+		Addr:           fmt.Sprintf(":%d", setting.ServerSetting.HTTPPort),
 		Handler:        router,
-		ReadTimeout:    setting.ReadTimeout,
-		WriteTimeout:   setting.WriteTimeout,
+		ReadTimeout:    setting.ServerSetting.ReadTimeout,
+		WriteTimeout:   setting.ServerSetting.WriteTimeout,
 		MaxHeaderBytes: 1 << 20,
 	}
 

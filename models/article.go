@@ -2,13 +2,11 @@ package models
 
 import (
 	"github.com/jinzhu/gorm"
-
-	"time"
 )
 
 // Article 文章Model
 type Article struct {
-	Model
+	gorm.Model
 	TagID      int    `json:"tag_id" gorm:"index"`
 	Tag        Tag    `json:"tag"`
 	Title      string `json:"title"`
@@ -68,16 +66,4 @@ func AddArticle(data map[string]interface{}) bool {
 func DeleteArticle(id int) bool {
 	db.Where("id = ?", id).Delete(Article{})
 	return true
-}
-
-// BeforeCreate 在创建文章之前添加创建时间
-func (article *Article) BeforeCreate(scope *gorm.Scope) error {
-	scope.SetColumn("CreatedOn", time.Now().Unix())
-	return nil
-}
-
-// BeforeUpdate 在更新文章之前添加更新时间
-func (article *Article) BeforeUpdate(scope *gorm.Scope) error {
-	scope.SetColumn("ModifiedOn", time.Now().Unix())
-	return nil
 }

@@ -7,7 +7,7 @@ import (
 	"github.com/samoy/go-blog/pkg/setting"
 )
 
-var jwtSecret = []byte(setting.JwtSecret)
+var jwtSecret = []byte(setting.AppSetting.JwtSecret)
 
 // Claims jwt加密原文
 type Claims struct {

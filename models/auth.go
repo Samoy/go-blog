@@ -1,7 +1,10 @@
 package models
 
+import "github.com/jinzhu/gorm"
+
 // Auth 认证Model
 type Auth struct {
+	gorm.Model
 	ID       int    `gorm:"primary_key" json:"id"`
 	Username string `json:"username"`
 	Password string `json:"password"`

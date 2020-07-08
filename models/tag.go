@@ -1,14 +1,12 @@
 package models
 
 import (
-	"time"
-
 	"github.com/jinzhu/gorm"
 )
 
 // Tag 标签Model
 type Tag struct {
-	Model
+	gorm.Model
 	Name       string `json:"name"`
 	CreatedBy  string `json:"created_by"`
 	ModifiedBy string `json:"modified_by"`
@@ -61,16 +59,4 @@ func EditTag(id int, data interface{}) bool {
 func DeleteTag(id int) bool {
 	db.Where("id=?", id).Delete(&Tag{})
 	return true
-}
-
-// BeforeCreate 在创建标签时添加创建时间
-func (tag *Tag) BeforeCreate(scope *gorm.Scope) error {
-	scope.SetColumn("CreatedOn", time.Now().Unix())
-	return nil
-}
-
-// BeforeUpdate 在更新标签时添加更新时间
-func (tag *Tag) BeforeUpdate(scope *gorm.Scope) error {
-	scope.SetColumn("ModifiedOn", time.Now().Unix())
-	return nil
 }
