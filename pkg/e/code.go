@@ -40,6 +40,10 @@ const (
 	ErrorEditTagFail = 10015
 	// ErrorDeleteTagFail 删除标签失败
 	ErrorDeleteTagFail = 10016
+	// ErrorExportTagFail 导出标签失败
+	ErrorExportTagFail = 10017
+	// ErrorImportTagFail 导入标签失败
+	ErrorImportTagFail = 10018
 	// ErrorAuthCheckTokenFail Token鉴权失败
 	ErrorAuthCheckTokenFail = 20001
 	// ErrorAuthCheckTokenTimeout Token已超时

@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/samoy/go-blog/middleware/jwt"
+	"github.com/samoy/go-blog/pkg/export"
 	"github.com/samoy/go-blog/pkg/setting"
 	"github.com/samoy/go-blog/pkg/upload"
 	"github.com/samoy/go-blog/routers/api"
@@ -19,6 +20,7 @@ func InitRouter() *gin.Engine {
 	gin.SetMode(setting.ServerSetting.RunMode)
 
 	r.StaticFS("/upload/images", http.Dir(upload.GetImageFullPath()))
+	r.StaticFS("/export", http.Dir(export.GetExcelFullPath()))
 	r.GET("/auth", api.GetAuth)
 	r.POST("/upload", api.UploadImage)
 
@@ -27,12 +29,14 @@ func InitRouter() *gin.Engine {
 	{
 		//获取标签列表
 		apiV1.GET("/tags", v1.GetTags)
-		//信件标签
+		//新增标签
 		apiV1.POST("/tags", v1.AddTag)
 		//修改标签
 		apiV1.PUT("/tags/:id", v1.EditTag)
 		//删除标签
 		apiV1.DELETE("/tags/:id", v1.DeleteTag)
+		r.POST("/tags/export", v1.ExportTag)
+		r.POST("/tags/import", v1.ImportTag)
 
 		//获取文章列表
 		apiV1.GET("/articles", v1.GetArticles)

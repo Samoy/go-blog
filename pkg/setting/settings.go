@@ -13,10 +13,12 @@ type App struct {
 	PageSize        int
 	RuntimeRootPath string
 
-	ImagePrefixURL string
+	PrefixURL      string
 	ImageSavePath  string
 	ImageMaxSize   int
 	ImageAllowExts []string
+
+	ExportSavePath string
 
 	LogSavePath string
 	LogSaveName string

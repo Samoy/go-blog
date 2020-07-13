@@ -9,16 +9,22 @@ import (
 	"time"
 
 	"github.com/samoy/go-blog/models"
+	"github.com/samoy/go-blog/pkg/gredis"
 	"github.com/samoy/go-blog/pkg/logging"
 	"github.com/samoy/go-blog/pkg/setting"
+	"github.com/samoy/go-blog/pkg/util"
 	"github.com/samoy/go-blog/routers"
 )
 
-func main() {
-
+func init() {
 	setting.Setup()
 	models.Setup()
 	logging.Setup()
+	gredis.Setup()
+	util.Setup()
+}
+
+func main() {
 
 	router := routers.InitRouter()
 	s := &http.Server{

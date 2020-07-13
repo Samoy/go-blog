@@ -3,6 +3,8 @@ module github.com/samoy/go-blog
 go 1.13
 
 require (
+	github.com/360EntSecGroup-Skylar/excelize v1.4.1
+	github.com/EDDYCJY/go-gin-example v0.0.0-20200505102242-63963976dee0
 	github.com/astaxie/beego v1.12.2
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/fvbock/endless v0.0.0-20170109170031-447134032cb6

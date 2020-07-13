@@ -7,6 +7,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/samoy/go-blog/pkg/app"
 	"github.com/samoy/go-blog/pkg/e"
+	"github.com/samoy/go-blog/pkg/export"
+	"github.com/samoy/go-blog/pkg/logging"
 	"github.com/samoy/go-blog/pkg/service"
 	"github.com/samoy/go-blog/pkg/setting"
 	"github.com/samoy/go-blog/pkg/util"
@@ -164,6 +166,50 @@ func DeleteTag(c *gin.Context) {
 
 	if err := tagService.Delete(); err != nil {
 		appG.Response(http.StatusInternalServerError, e.ErrorDeleteTagFail, nil)
+		return
+	}
+
+	appG.Response(http.StatusOK, e.Success, nil)
+}
+
+// ExportTag 导出标签
+func ExportTag(c *gin.Context) {
+	appG := app.Gin{C: c}
+	name := c.PostForm("name")
+	state := -1
+	if arg := c.PostForm("state"); arg != "" {
+		state = com.StrTo(arg).MustInt()
+	}
+	tagService := service.Tag{
+		Name:  name,
+		State: state,
+	}
+	filename, err := tagService.Export()
+	if err != nil {
+		appG.Response(http.StatusOK, e.ErrorExportTagFail, nil)
+		return
+	}
+	appG.Response(http.StatusOK, e.Success, map[string]string{
+		"export_url":      export.GetExcelFullURL(filename),
+		"export_save_url": export.GetExcelFullPath() + filename,
+	})
+}
+
+func ImportTag(c *gin.Context) {
+	appG := app.Gin{C: c}
+
+	file, _, err := c.Request.FormFile("file")
+	if err != nil {
+		logging.Warn(err)
+		appG.Response(http.StatusOK, e.Error, nil)
+		return
+	}
+
+	tagService := service.Tag{}
+	err = tagService.Import(file)
+	if err != nil {
+		logging.Warn(err)
+		appG.Response(http.StatusOK, e.ErrorImportTagFail, nil)
 		return
 	}
 

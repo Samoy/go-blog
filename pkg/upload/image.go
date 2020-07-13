@@ -16,7 +16,7 @@ import (
 
 // GetImageFullURL 获取图片url
 func GetImageFullURL(name string) string {
-	return setting.AppSetting.ImagePrefixURL + "/" + GetImagePath() + name
+	return setting.AppSetting.PrefixURL + "/" + GetImagePath() + name
 }
 
 // GetImageName 获取图片名称

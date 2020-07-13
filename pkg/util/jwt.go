@@ -4,10 +4,9 @@ import (
 	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"
-	"github.com/samoy/go-blog/pkg/setting"
 )
 
-var jwtSecret = []byte(setting.AppSetting.JwtSecret)
+var jwtSecret []byte
 
 // Claims jwt加密原文
 type Claims struct {

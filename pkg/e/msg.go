@@ -21,6 +21,8 @@ var MsgFlags = map[int]string{
 	ErrorAddTagFail:             "添加标签失败",
 	ErrorEditTagFail:            "编辑标签失败",
 	ErrorDeleteTagFail:          "删除标签失败",
+	ErrorExportTagFail:          "导出标签失败",
+	ErrorImportTagFail:          "导入标签失败",
 	ErrorAuthCheckTokenFail:     "Token鉴权失败",
 	ErrorAuthCheckTokenTimeout:  "Token已超时",
 	ErrorAuthToken:              "Token生成失败",
