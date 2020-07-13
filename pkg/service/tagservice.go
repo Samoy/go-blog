@@ -15,6 +15,7 @@ import (
 	"github.com/tealeg/xlsx"
 )
 
+// Tag 标签结构体
 type Tag struct {
 	ID         int
 	Name       string
@@ -26,18 +27,22 @@ type Tag struct {
 	PageSize int
 }
 
+// ExistByName 通过名字判断标签是否存在
 func (t *Tag) ExistByName() (bool, error) {
 	return models.ExistTagByName(t.Name)
 }
 
+// ExistByID 通过ID判断标签是否存在
 func (t *Tag) ExistByID() (bool, error) {
 	return models.ExistTagByID(t.ID)
 }
 
+// Add 添加标签
 func (t *Tag) Add() error {
 	return models.AddTag(t.Name, t.State, t.CreatedBy)
 }
 
+// Edit 编辑标签
 func (t *Tag) Edit() error {
 	data := make(map[string]interface{})
 	data["modified_by"] = t.ModifiedBy
@@ -49,14 +54,17 @@ func (t *Tag) Edit() error {
 	return models.EditTag(t.ID, data)
 }
 
+// Delete 删除标签
 func (t *Tag) Delete() error {
 	return models.DeleteTag(t.ID)
 }
 
+// Count 标签计数
 func (t *Tag) Count() (int, error) {
 	return models.GetTagTotal(t.getMaps())
 }
 
+// GetAll 获取全部标签
 func (t *Tag) GetAll() ([]models.Tag, error) {
 	var (
 		tags, cacheTags []models.Tag
@@ -88,6 +96,7 @@ func (t *Tag) GetAll() ([]models.Tag, error) {
 	return tags, nil
 }
 
+// getMaps 获取标签映射
 func (t *Tag) getMaps() map[string]interface{} {
 	maps := make(map[string]interface{})
 	maps["deleted_on"] = 0

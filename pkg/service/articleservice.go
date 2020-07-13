@@ -25,6 +25,7 @@ type Article struct {
 	PageSize int
 }
 
+// Add 添加文章
 func (a *Article) Add() error {
 	article := map[string]interface{}{
 		"tag_id":          a.TagID,
@@ -43,6 +44,7 @@ func (a *Article) Add() error {
 	return nil
 }
 
+// Edit 编辑文章
 func (a *Article) Edit() error {
 	return models.EditArticle(a.ID, map[string]interface{}{
 		"tag_id":          a.TagID,
@@ -55,6 +57,7 @@ func (a *Article) Edit() error {
 	})
 }
 
+// Get 获取文章
 func (a *Article) Get() (*models.Article, error) {
 	var cacheArticle *models.Article
 
@@ -79,6 +82,7 @@ func (a *Article) Get() (*models.Article, error) {
 	return article, nil
 }
 
+// GetAll 获取全部文章
 func (a *Article) GetAll() ([]*models.Article, error) {
 	var (
 		articles, cacheArticles []*models.Article
@@ -111,18 +115,22 @@ func (a *Article) GetAll() ([]*models.Article, error) {
 	return articles, nil
 }
 
+// Delete 删除文章
 func (a *Article) Delete() error {
 	return models.DeleteArticle(a.ID)
 }
 
+// ExistByID 通过ID判断文章是否存在
 func (a *Article) ExistByID() (bool, error) {
 	return models.ExistArticleByID(a.ID)
 }
 
+// Count 文章计数
 func (a *Article) Count() (int, error) {
 	return models.GetArticleTotal(a.getMaps())
 }
 
+// getMaps 获取文章映射
 func (a *Article) getMaps() map[string]interface{} {
 	maps := make(map[string]interface{})
 	maps["deleted_on"] = 0
