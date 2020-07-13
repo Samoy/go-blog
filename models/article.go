@@ -7,63 +7,110 @@ import (
 // Article 文章Model
 type Article struct {
 	gorm.Model
-	TagID      int    `json:"tag_id" gorm:"index"`
-	Tag        Tag    `json:"tag"`
-	Title      string `json:"title"`
-	Desc       string `json:"desc"`
-	Content    string `json:"content"`
-	CreatedBy  string `json:"created_by"`
-	ModifiedBy string `json:"modified_by"`
-	State      int    `json:"state"`
+	TagID         int    `json:"tag_id" gorm:"index"`
+	Tag           Tag    `json:"tag"`
+	Title         string `json:"title"`
+	Desc          string `json:"desc"`
+	Content       string `json:"content"`
+	CreatedBy     string `json:"created_by"`
+	ModifiedBy    string `json:"modified_by"`
+	State         int    `json:"state"`
+	CoverImageURL string `json:"cover_image_url"`
 }
 
-// ExistArticleByID 根据ID判断文章是否存在
-func ExistArticleByID(id int) bool {
+// ExistArticleByID checks if an article exists based on ID
+func ExistArticleByID(id int) (bool, error) {
 	var article Article
-	db.Select("id").Where("id=?", id).First(&article)
-	return article.ID > 0
+	err := db.Select("id").Where("id = ? AND deleted_on = ? ", id, 0).First(&article).Error
+	if err != nil && err != gorm.ErrRecordNotFound {
+		return false, err
+	}
+
+	if article.ID > 0 {
+		return true, nil
+	}
+
+	return false, nil
 }
 
-// GetArticleTotal 获取文章总数
-func GetArticleTotal(maps interface{}) (count int) {
-	db.Model(&Article{}).Where(maps).Count(&count)
-	return
+// GetArticleTotal gets the total number of articles based on the constraints
+func GetArticleTotal(maps interface{}) (int, error) {
+	var count int
+	if err := db.Model(&Article{}).Where(maps).Count(&count).Error; err != nil {
+		return 0, err
+	}
+
+	return count, nil
 }
 
-// GetArticles 获取多篇文章
-func GetArticles(pageNum int, pageSize int, maps interface{}) (articles []Article) {
-	db.Preload("Tag").Where(maps).Offset(pageNum).Limit(pageSize).Find(&articles)
-	return
+// GetArticles gets a list of articles based on paging constraints
+func GetArticles(pageNum int, pageSize int, maps interface{}) ([]*Article, error) {
+	var articles []*Article
+	err := db.Preload("Tag").Where(maps).Offset(pageNum).Limit(pageSize).Find(&articles).Error
+	if err != nil && err != gorm.ErrRecordNotFound {
+		return nil, err
+	}
+
+	return articles, nil
 }
 
-// GetArticle 根据id获取文章
-func GetArticle(id int) (article Article) {
-	db.Where("id = ?", id).First(&article)
-	db.Model(&article).Related(&article.Tag)
-	return
+// GetArticle Get a single article based on ID
+func GetArticle(id int) (*Article, error) {
+	var article Article
+	err := db.Where("id = ? AND deleted_on = ? ", id, 0).First(&article).Error
+	if err != nil && err != gorm.ErrRecordNotFound {
+		return nil, err
+	}
+
+	err = db.Model(&article).Related(&article.Tag).Error
+	if err != nil && err != gorm.ErrRecordNotFound {
+		return nil, err
+	}
+
+	return &article, nil
 }
 
-// EditArticle 编辑文章
-func EditArticle(id int, data interface{}) bool {
-	db.Model(&Article{}).Where("id=?", id).Updates(data)
-	return true
+// EditArticle modify a single article
+func EditArticle(id int, data interface{}) error {
+	if err := db.Model(&Article{}).Where("id = ? AND deleted_on = ? ", id, 0).Updates(data).Error; err != nil {
+		return err
+	}
+
+	return nil
 }
 
-// AddArticle 添加文章
-func AddArticle(data map[string]interface{}) bool {
-	db.Create(&Article{
-		TagID:     data["tag_id"].(int),
-		Title:     data["title"].(string),
-		Desc:      data["desc"].(string),
-		Content:   data["content"].(string),
-		CreatedBy: data["created_by"].(string),
-		State:     data["state"].(int),
-	})
-	return true
+// AddArticle add a single article
+func AddArticle(data map[string]interface{}) error {
+	article := Article{
+		TagID:         data["tag_id"].(int),
+		Title:         data["title"].(string),
+		Desc:          data["desc"].(string),
+		Content:       data["content"].(string),
+		CreatedBy:     data["created_by"].(string),
+		State:         data["state"].(int),
+		CoverImageURL: data["cover_image_url"].(string),
+	}
+	if err := db.Create(&article).Error; err != nil {
+		return err
+	}
+
+	return nil
 }
 
-// DeleteArticle 删除文章
-func DeleteArticle(id int) bool {
-	db.Where("id = ?", id).Delete(Article{})
-	return true
+// DeleteArticle delete a single article
+func DeleteArticle(id int) error {
+	if err := db.Where("id = ?", id).Delete(Article{}).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// CleanAllArticle clear all article
+func CleanAllArticle() error {
+	if err := db.Unscoped().Where("deleted_on != ? ", 0).Delete(&Article{}).Error; err != nil {
+		return err
+	}
+
+	return nil
 }

@@ -51,6 +51,18 @@ type Database struct {
 // DatabaseSetting 数据库配置
 var DatabaseSetting = &Database{}
 
+// Redis Redis配置结构体
+type Redis struct {
+	Host        string
+	Password    string
+	MaxIdle     int
+	MaxActive   int
+	IdleTimeout time.Duration
+}
+
+// RedisSetting Redis配置
+var RedisSetting = &Redis{}
+
 // Setup 初始化
 func Setup() {
 	Cfg, err := ini.Load("conf/app.ini")

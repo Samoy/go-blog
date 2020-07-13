@@ -2,12 +2,12 @@ package api
 
 import (
 	"net/http"
-	"strings"
 
 	"github.com/astaxie/beego/validation"
 	"github.com/gin-gonic/gin"
-	"github.com/samoy/go-blog/models"
+	"github.com/samoy/go-blog/pkg/app"
 	"github.com/samoy/go-blog/pkg/e"
+	"github.com/samoy/go-blog/pkg/service"
 	"github.com/samoy/go-blog/pkg/util"
 )
 
@@ -18,38 +18,40 @@ type auth struct {
 
 // GetAuth 获取认证
 func GetAuth(c *gin.Context) {
-	username := c.Query("username")
-	password := c.Query("password")
-
+	appG := app.Gin{C: c}
 	valid := validation.Validation{}
+
+	username := c.PostForm("username")
+	password := c.PostForm("password")
+
 	a := auth{Username: username, Password: password}
 	ok, _ := valid.Valid(&a)
-	data := make(map[string]interface{})
-	code := e.InvalidParams
-	var msg string
-	if ok {
-		isExist := models.CheckAuth(username, password)
-		if isExist {
-			token, err := util.GenerateToken(username, password)
-			if err != nil {
-				code = e.ErrorAuthToken
-			} else {
-				data["token"] = token
-				code = e.Success
-			}
-		} else {
-			code = e.ErrorAuth
-		}
-		msg = e.GetMsg(code)
-	} else {
-		for _, err := range valid.Errors {
-			msg += err.Message + ";"
-		}
-		msg = strings.TrimRight(msg, ";")
+
+	if !ok {
+		app.MarkErrors(valid.Errors)
+		appG.Response(http.StatusBadRequest, e.InvalidParams, nil)
+		return
 	}
-	c.JSON(http.StatusOK, gin.H{
-		"code": code,
-		"msg":  e.GetMsg(code),
-		"data": data,
+
+	authService := service.Auth{Username: username, Password: password}
+	isExist, err := authService.Check()
+	if err != nil {
+		appG.Response(http.StatusInternalServerError, e.ErrorAuthCheckTokenFail, nil)
+		return
+	}
+
+	if !isExist {
+		appG.Response(http.StatusUnauthorized, e.ErrorAuth, nil)
+		return
+	}
+
+	token, err := util.GenerateToken(username, password)
+	if err != nil {
+		appG.Response(http.StatusInternalServerError, e.ErrorAuthToken, nil)
+		return
+	}
+
+	appG.Response(http.StatusOK, e.Success, map[string]string{
+		"token": token,
 	})
 }
