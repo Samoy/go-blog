@@ -18,8 +18,8 @@ import (
 
 func init() {
 	setting.Setup()
-	models.Setup()
 	logging.Setup()
+	models.Setup()
 	gredis.Setup()
 	util.Setup()
 }
